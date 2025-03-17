@@ -1,0 +1,23 @@
+# ignore dependecies
+/vendor/
+
+# ignore IDE setting
+.idea/
+.vscode/
+
+# ignore system file
+.DS_Store
+
+# ignore environment
+.env
+
+# ignore logging file
+/logs/
+*.log
+
+# ignore cache
+/cache/
+
+# ignire database
+*.db
+*.sqlite
