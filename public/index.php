@@ -12,11 +12,16 @@ $pdo = new PDO('sqlite:' . $config['path']);
 
 // 加载 Group 路由
 $groupRoutes = require __DIR__ . '/../src/Routes/GroupRoute.php';
+$userRoutes = require __DIR__ . '/../src/Routes/UserRoute.php';
 $messageRoutes = require __DIR__ . '/../src/Routes/MessageRoute.php';
 
 // 注册 Group 路由
 $app->group('/groups', function ($group) use ($groupRoutes, $pdo) {
     $groupRoutes($group, $pdo);
+});
+
+$app->group('/users', function ($user) use ($userRoutes, $pdo) {
+    $userRoutes($user, $pdo);
 });
 
 $app->group('', function ($message) use ($messageRoutes, $pdo) {

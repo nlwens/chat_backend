@@ -27,20 +27,4 @@ class GroupController {
         $response->getBody()->write(json_encode(['id' => $groupId]));
         return $response->withHeader('Content-Type', 'application/json');
     }
-
-    //user join a group
-    public function joinGroup(Request $request, Response $response, $args) {
-        $data = $request->getParsedBody();
-        $userId = $data['user_id'];
-        $groupId = $args['groupId'];
-
-        // 将用户加入群组
-        if ($this->groupModel->addUserToGroup($userId, $groupId)) {
-            $response->getBody()->write(json_encode(['message' => 'User joined the group successfully']));
-            return $response->withHeader('Content-Type', 'application/json');
-        } else {
-            $response->getBody()->write(json_encode(['message' => 'User is already in the group']));
-            return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
-        }
-    }
 }
