@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- Table for chatting groups
-CREATE TABLE IF NOT EXISTS chat_groups (
+CREATE TABLE IF NOT EXISTS groups (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     group_name TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -22,4 +22,14 @@ CREATE TABLE IF NOT EXISTS messages (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (group_id) REFERENCES chat_groups(id),
     FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- 创建 user_groups 表
+CREATE TABLE user_groups (
+                             id INTEGER PRIMARY KEY AUTOINCREMENT,
+                             user_id INTEGER NOT NULL,
+                             group_id INTEGER NOT NULL,
+                             joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                             FOREIGN KEY (user_id) REFERENCES users(id),
+                             FOREIGN KEY (group_id) REFERENCES groups(id)
 );
