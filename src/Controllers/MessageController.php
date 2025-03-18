@@ -15,8 +15,8 @@ class MessageController {
     // 发送消息
     public function sendMessage(Request $request, Response $response, $args) {
         $data = $request->getParsedBody();
-        $groupId = $args['groupId'];
-        $userId = $data['user_id'];
+        $userId = $data['userId'] ?? null;
+        $groupId = $args['groupId'] ?? null;
         $content = $data['content'];
 
         $messageId = $this->messageModel->create($groupId, $userId, $content);
@@ -25,7 +25,7 @@ class MessageController {
     }
 
     // 获取群组消息
-    public function getMessagesByGroup(Request $request, Response $response, $args) {
+    public function getMessagesByGroup(Response $response, $args) {
         $groupId = $args['groupId'];
         $messages = $this->messageModel->getByGroup($groupId);
         $response->getBody()->write(json_encode($messages));
