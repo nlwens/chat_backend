@@ -5,20 +5,21 @@ use Slim\Routing\RouteCollectorProxy;
 use App\Controllers\MessageController;
 use App\Models\Message;
 use App\Middlewares\GroupPermissionMiddleware;
-use App\Models\User;
+use App\Models\Group;
 
 return function (RouteCollectorProxy $message, $pdo) {
     $messageModel = new Message($pdo);
-    $userModel = new User($pdo);
+    $groupModel = new Group($pdo);
     $messageController = new MessageController($messageModel);
 
-    // 发送消息（需要群组权限检查）
-    $message->post('/groups/{groupId}/messages', [$messageController, 'sendMessage'])
-        ->add(new GroupPermissionMiddleware($userModel))
-        ->add(new AuthMiddleware($pdo));
+    $message->group('', function (RouteCollectorProxy $message) use ($messageController) {
 
-    // 获取群组消息（需要群组权限检查）
-    $message->get('/groups/{groupId}/messages', [$messageController, 'getMessagesByGroup'])
-        ->add(new GroupPermissionMiddleware($userModel))
+        // Send a message to a group
+        $message->post('/groups/{groupId}/messages', [$messageController, 'sendMessage']);
+
+        // Get all message from a group
+        $message->get('/groups/{groupId}/messages', [$messageController, 'getMessagesByGroup']);
+
+    })->add(new GroupPermissionMiddleware($groupModel))
         ->add(new AuthMiddleware($pdo));
 };

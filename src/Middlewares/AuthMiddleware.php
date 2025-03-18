@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Middlewares;
 
 use PDO;
@@ -12,23 +13,21 @@ class AuthMiddleware implements MiddlewareInterface
 {
     private PDO $pdo;
 
-    public function __construct(PDO $pdo){
+    public function __construct(PDO $pdo)
+    {
         $this->pdo = $pdo;
     }
 
     public function process(Request $request, RequestHandler $handler): Response
     {
-        // 从请求头获取 Authorization
         $authHeader = $request->getHeaderLine('Authorization');
 
         if (!$authHeader || !preg_match('/Bearer\s+(\S+)/', $authHeader, $matches)) {
             return $this->unauthorizedResponse("Missing or invalid token");
         }
 
-        $data = $request->getParsedBody();
-        $userId = $data['userId'] ?? null;
-
-        $token = $matches[1]; // 提取 Bearer Token
+        $token = $matches[1]; // get bearer token
+        $userId = $request->getQueryParams()['userId'] ?? null;
         $user = $this->verifyToken($token, $userId);
 
         if (!$user) {
@@ -38,7 +37,8 @@ class AuthMiddleware implements MiddlewareInterface
         return $handler->handle($request);
     }
 
-    private function verifyToken($token, $userId){
+    private function verifyToken($token, $userId)
+    {
         $stmt = $this->pdo->prepare("SELECT id FROM users WHERE id = :userId AND token = :token");
         $stmt->execute([
             'userId' => $userId,

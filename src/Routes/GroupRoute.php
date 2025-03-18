@@ -1,4 +1,7 @@
 <?php
+
+use App\Middlewares\AuthMiddleware;
+use App\Middlewares\GroupPermissionMiddleware;
 use Slim\Routing\RouteCollectorProxy;
 use App\Controllers\GroupController;
 use App\Models\Group;
@@ -7,12 +10,20 @@ return function (RouteCollectorProxy $group, $pdo) {
     $groupModel = new Group($pdo);
     $groupController = new GroupController($groupModel);
 
-    // 获取所有群组
-    $group->get('', [$groupController, 'getAll']);
+    $group->group('', function (RouteCollectorProxy $group) use ($groupController, $groupModel) {
 
-    // 创建群组
-    $group->post('', [$groupController, 'create']);
+        // get all groups
+        $group->get('', [$groupController, 'getAll']);
 
-    // user join a group
-    $group->post('/{groupId}/join', [$groupController, 'joinGroup']);
+        // create a new group
+        $group->post('', [$groupController, 'create']);
+
+        // user join or leave a group
+        $group->post('/{groupId}/members', [$groupController, 'joinGroup']);
+
+        // user leave a group
+        $group->delete('/{groupId}/members', [$groupController, 'leaveGroup'])
+            ->add(new GroupPermissionMiddleware($groupModel));
+
+    })->add(new AuthMiddleware($pdo));
 };
