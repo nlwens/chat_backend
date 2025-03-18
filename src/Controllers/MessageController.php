@@ -25,7 +25,7 @@ class MessageController {
     }
 
     // 获取群组消息
-    public function getMessagesByGroup(Response $response, $args) {
+    public function getMessagesByGroup(Request $request, Response $response, $args) {
         $groupId = $args['groupId'];
         $messages = $this->messageModel->getByGroup($groupId);
         $response->getBody()->write(json_encode($messages));
