@@ -21,3 +21,7 @@
 # ignire database
 *.db
 *.sqlite
+
+#ignore test cache
+.phpunit.result.cache
+
