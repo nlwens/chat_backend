@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\Group;
+use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -15,35 +16,35 @@ class GroupController
         $this->groupModel = $groupModel;
     }
 
-    public function getAll(Request $request, Response $response): \Psr\Http\Message\MessageInterface|Response
+    public function getAll(Request $request, Response $response): MessageInterface|Response
     {
         $groups = $this->groupModel->getAll();
         return $this->jsonResponse($response, $groups);
     }
 
     // create a new group
-    public function create(Request $request, Response $response): \Psr\Http\Message\MessageInterface|Response
+    public function create(Request $request, Response $response): MessageInterface|Response
     {
         $data = $request->getParsedBody();
         $groupName = $data['group_name'];
 
-        $groupId = $this->groupModel->create($groupName);
-        return $this->jsonResponse($response, ['id' => $groupId]);
+        $message = $this->groupModel->create($groupName);
+        return $this->jsonResponse($response, ['message' => $message]);
     }
 
-    public function joinGroup(Request $request, Response $response, $args): \Psr\Http\Message\MessageInterface|Response
+    public function joinGroup(Request $request, Response $response, $args): MessageInterface|Response
     {
         return $this->modifyGroupMembership($request, $response, $args, 'join');
     }
 
-    public function leaveGroup(Request $request, Response $response, $args): \Psr\Http\Message\MessageInterface|Response
+    public function leaveGroup(Request $request, Response $response, $args): MessageInterface|Response
     {
         return $this->modifyGroupMembership($request, $response, $args, 'leave');
     }
 
-    private function modifyGroupMembership(Request $request, Response $response, $args, $action): \Psr\Http\Message\MessageInterface|Response
+    private function modifyGroupMembership(Request $request, Response $response, $args, $action): MessageInterface|Response
     {
-        $userId = $request->getQueryParams()['userId'] ?? null;
+        $userId = $args['userId'] ?? null;
         $groupId = $args['groupId'] ?? null;
 
         if (!$userId || !$groupId) {
@@ -66,7 +67,7 @@ class GroupController
         return $this->jsonResponse($response, ['message' => 'Unknown error occurred'], 500);
     }
 
-    private function jsonResponse(Response $response, array $data, int $status = 200): \Psr\Http\Message\MessageInterface|Response
+    private function jsonResponse(Response $response, array $data, int $status = 200): MessageInterface|Response
     {
         $response->getBody()->write(json_encode($data));
         return $response->withHeader('Content-Type', 'application/json')->withStatus($status);

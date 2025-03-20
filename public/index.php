@@ -1,7 +1,5 @@
 <?php
-
 use Slim\Factory\AppFactory;
-
 require __DIR__ . '/../vendor/autoload.php';
 
 // 创建 Slim 应用

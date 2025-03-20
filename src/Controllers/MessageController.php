@@ -15,11 +15,11 @@ class MessageController
         $this->messageModel = $messageModel;
     }
 
-    // 发送消息
+    // send message to a group
     public function sendMessage(Request $request, Response $response, $args)
     {
         $content = $request->getParsedBody()['content'];
-        $userId = $request->getQueryParams()['userId'];
+        $userId = $args['userId'];
         $groupId = $args['groupId'];
 
         // check if message is empty
@@ -34,11 +34,12 @@ class MessageController
         return $response->withHeader('Content-Type', 'application/json');
     }
 
-    // 获取群组消息
     public function getMessagesByGroup(Request $request, Response $response, $args)
     {
         $groupId = $args['groupId'];
-        $messages = $this->messageModel->getByGroup($groupId);
+        $queryParams = $request->getQueryParams();
+        $since = $queryParams['since'] ?? null;
+        $messages = $this->messageModel->getByGroup($groupId, $since);
         $response->getBody()->write(json_encode($messages));
         return $response->withHeader('Content-Type', 'application/json');
     }

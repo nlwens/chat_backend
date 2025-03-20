@@ -16,9 +16,12 @@ class Group
 
     public function create($groupName): false|string
     {
-        $stmt = $this->pdo->prepare('INSERT INTO groups (group_name) VALUES (:group_name)');
+        $stmt = $this->pdo->prepare('
+            INSERT INTO groups (group_name) 
+            VALUES (:group_name)'
+        );
         $stmt->execute(['group_name' => $groupName]);
-        return $this->pdo->lastInsertId();
+        return 'Group created successfully';
     }
 
     public function getAll(): array
@@ -43,7 +46,10 @@ class Group
         }
 
         try {
-            $stmt = $this->pdo->prepare('INSERT INTO user_groups (user_id, group_id) VALUES (:user_id, :group_id)');
+            $stmt = $this->pdo->prepare('
+                INSERT INTO user_groups (user_id, group_id) 
+                VALUES (:user_id, :group_id)'
+            );
             $stmt->execute([
                 'user_id' => $userId,
                 'group_id' => $groupId
@@ -62,7 +68,10 @@ class Group
     public function deleteUserFromGroup($userId, $groupId): true
     {
         try {
-            $stmt = $this->pdo->prepare('DELETE FROM user_groups WHERE user_id = :user_id AND group_id = :group_id');
+            $stmt = $this->pdo->prepare('
+                DELETE FROM user_groups 
+                WHERE user_id = :user_id AND group_id = :group_id'
+            );
             $stmt->execute([
                 'user_id' => $userId,
                 'group_id' => $groupId
@@ -82,7 +91,10 @@ class Group
 
     public function isUserInGroup($userId, $groupId): bool
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM user_groups WHERE user_id = :user_id AND group_id = :group_id');
+        $stmt = $this->pdo->prepare('
+            SELECT * FROM user_groups 
+            WHERE user_id = :user_id AND group_id = :group_id'
+        );
         $stmt->execute([
             'user_id' => $userId,
             'group_id' => $groupId
