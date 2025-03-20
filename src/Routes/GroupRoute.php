@@ -13,16 +13,16 @@ return function (RouteCollectorProxy $group, $pdo) {
     $group->group('', function (RouteCollectorProxy $group) use ($groupController, $groupModel) {
 
         // get all groups
-        $group->get('/users/{userId}', [$groupController, 'getAll']);
+        $group->get('', [$groupController, 'getAll']);
 
         // create a new group
-        $group->post('/users/{userId}', [$groupController, 'create']);
+        $group->post('', [$groupController, 'create']);
 
         // user join or leave a group
-        $group->post('/{groupId}/users/{userId}/members', [$groupController, 'joinGroup']);
+        $group->post('/{groupId}/members', [$groupController, 'joinGroup']);
 
         // user leave a group
-        $group->delete('/{groupId}/users/{userId}/members', [$groupController, 'leaveGroup'])
+        $group->delete('/{groupId}/members', [$groupController, 'leaveGroup'])
             ->add(new GroupPermissionMiddleware($groupModel));
 
     })->add(new AuthMiddleware($pdo));

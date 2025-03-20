@@ -19,19 +19,18 @@ class MessageController
     public function sendMessage(Request $request, Response $response, $args)
     {
         $content = $request->getParsedBody()['content'];
-        $userId = $args['userId'];
+        $userId = $request->getHeaderLine('X-User-Id');
         $groupId = $args['groupId'];
 
         // check if message is empty
         if (!$content) {
-            $response = new \Slim\Psr7\Response();
             $response->getBody()->write(json_encode(['error' => 'Message cannot be empty']));
             return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
         }
 
-        $messageId = $this->messageModel->create($groupId, $userId, $content);
-        $response->getBody()->write(json_encode(['id' => $messageId]));
-        return $response->withHeader('Content-Type', 'application/json');
+        $message = $this->messageModel->create($groupId, $userId, $content);
+        $response->getBody()->write(json_encode(['message' => $message]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 
     public function getMessagesByGroup(Request $request, Response $response, $args)

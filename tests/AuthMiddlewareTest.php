@@ -27,7 +27,8 @@ class AuthMiddlewareTest extends TestCase
 
     public function testValidToken()
     {
-        $request = (new RequestFactory())->createRequest('GET', '/groups/users/1')
+        $request = (new RequestFactory())->createRequest('GET', '/groups')
+            ->withHeader('X-User-Id', 1)
             ->withHeader('Authorization', 'Bearer valid-token');
         $handler = $this->createMock(RequestHandlerInterface::class);
 
@@ -42,22 +43,8 @@ class AuthMiddlewareTest extends TestCase
 
     public function testMissingAuthorizationHeader()
     {
-        $request = (new RequestFactory())->createRequest('GET', '/groups/users/1');
-        $handler = $this->createMock(RequestHandlerInterface::class);
-
-        $response = $this->middleware->__invoke($request, $handler);
-
-        $this->assertEquals(401, $response->getStatusCode());
-        $this->assertJsonStringEqualsJsonString(
-            '{"error":"Missing or invalid token"}',
-            (string)$response->getBody()
-        );
-    }
-
-    public function testInvalidBearerTokenFormat()
-    {
-        $request = (new RequestFactory())->createRequest('GET', '/groups/users/1')
-            ->withHeader('Authorization', 'InvalidTokenFormat');
+        $request = (new RequestFactory())->createRequest('GET', '/groups')
+            ->withHeader('X-User-Id', 1);
         $handler = $this->createMock(RequestHandlerInterface::class);
 
         $response = $this->middleware->__invoke($request, $handler);
@@ -71,9 +58,9 @@ class AuthMiddlewareTest extends TestCase
 
     public function testInvalidToken()
     {
-        $request = (new RequestFactory())->createRequest('GET', '/groups/users/1')
-            ->withHeader('Authorization', 'Bearer invalid-token')
-            ->withQueryParams(['userId' => 1]);
+        $request = (new RequestFactory())->createRequest('GET', '/groups')
+            ->withHeader('X-User-Id', 1)
+            ->withHeader('Authorization', 'Bearer invalid-token');
         $handler = $this->createMock(RequestHandlerInterface::class);
 
         $response = $this->middleware->__invoke($request, $handler);

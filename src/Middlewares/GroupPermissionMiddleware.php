@@ -22,8 +22,7 @@ class GroupPermissionMiddleware
         $uri = $request->getUri();
         $path = $uri->getPath();
 
-        preg_match('/\/users\/(\d+)/', $path, $matches);
-        $userId = $matches[1] ?? null;
+        $userId = $request->getHeaderLine('X-User-Id');
 
         preg_match('/\/groups\/(\d+)/', $path, $matches);
         $groupId = $matches[1] ?? null;

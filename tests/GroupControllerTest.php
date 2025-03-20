@@ -50,8 +50,8 @@ class GroupControllerTest extends TestCase
         $factory = new RequestFactory();
         $streamFactory = new StreamFactory();
         $body = $streamFactory->createStream(json_encode(['group_name' => 'Test Group']));
-        $body->rewind();
-        $request = $factory->createRequest('POST', '/groups/users/1')
+        $request = $factory->createRequest('POST', '/groups')
+            ->withHeader('X-User-Id', 1)
             ->withHeader('Content-Type', 'application/json')
             ->withBody($body);
 
@@ -78,10 +78,10 @@ class GroupControllerTest extends TestCase
     public function testUserJoinAGroup()
     {
         $factory = new RequestFactory();
-        $request = $factory->createRequest('POST', '/groups/2/users/1/members');
+        $request = $factory->createRequest('POST', '/groups/2/members')
+            ->withHeader('X-User-Id', 1);
         $args = [
             'groupId' => 2,
-            'userId' => 1,
         ];
         $responseFactory = new ResponseFactory();
         $response = $responseFactory->createResponse();
@@ -106,10 +106,10 @@ class GroupControllerTest extends TestCase
     public function testUserJoinWhenAlreadyInGroup()
     {
         $factory = new RequestFactory();
-        $request = $factory->createRequest('POST', '/groups/1/users/1/members');
+        $request = $factory->createRequest('POST', '/groups/1/members')
+            ->withHeader('X-User-Id', 1);
         $args = [
             'groupId' => 1,
-            'userId' => 1,
         ];
 
         $responseFactory = new ResponseFactory();
@@ -123,17 +123,17 @@ class GroupControllerTest extends TestCase
         $responseBody = (string)$response->getBody();
         $this->assertJson($responseBody);
         $responseData = json_decode($responseBody, true);
-        $this->assertArrayHasKey('message', $responseData);
-        $this->assertEquals('User already in the group', $responseData['message']);
+        $this->assertArrayHasKey('error', $responseData);
+        $this->assertEquals('User already in the group', $responseData['error']);
     }
 
     public function testUserJoinGroupNotExists()
     {
         $factory = new RequestFactory();
-        $request = $factory->createRequest('POST', '/groups/groups/10/users/1/members');
+        $request = $factory->createRequest('POST', '/groups/10/members')
+            ->withHeader('X-User-Id', 1);
         $args = [
             'groupId' => 10,
-            'userId' => 1,
         ];
 
         $responseFactory = new ResponseFactory();
@@ -147,17 +147,17 @@ class GroupControllerTest extends TestCase
         $responseBody = (string)$response->getBody();
         $this->assertJson($responseBody);
         $responseData = json_decode($responseBody, true);
-        $this->assertArrayHasKey('message', $responseData);
-        $this->assertEquals('Group does not exist', $responseData['message']);
+        $this->assertArrayHasKey('error', $responseData);
+        $this->assertEquals('Group does not exist', $responseData['error']);
     }
 
     public function testUserLeaveAGroup()
     {
         $factory = new RequestFactory();
-        $request = $factory->createRequest('POST', '/groups/1/users/1/members');
+        $request = $factory->createRequest('POST', '/groups/1/members')
+            ->withHeader('X-User-Id', 1);
         $args = [
             'groupId' => 1,
-            'userId' => 1,
         ];
 
         $responseFactory = new ResponseFactory();

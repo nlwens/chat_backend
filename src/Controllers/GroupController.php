@@ -42,13 +42,15 @@ class GroupController
         return $this->modifyGroupMembership($request, $response, $args, 'leave');
     }
 
+    // it is not necessary to check if the user really exists in the users table
+    // because it can't pass the AuthMiddleware
     private function modifyGroupMembership(Request $request, Response $response, $args, $action): MessageInterface|Response
     {
-        $userId = $args['userId'] ?? null;
+        $userId = $request->getHeaderLine('X-User-Id');
         $groupId = $args['groupId'] ?? null;
 
         if (!$userId || !$groupId) {
-            return $this->jsonResponse($response, ['message' => 'User ID and Group ID are required'], 400);
+            return $this->jsonResponse($response, ['error' => 'User ID and Group ID are required'], 400);
         }
 
         try {
@@ -61,10 +63,10 @@ class GroupController
                 return $this->jsonResponse($response, ['message' => "User successfully {$status} the group"]);
             }
         } catch (\Exception $e) {
-            return $this->jsonResponse($response, ['message' => $e->getMessage()], 400);
+            return $this->jsonResponse($response, ['error' => $e->getMessage()], 400);
         }
 
-        return $this->jsonResponse($response, ['message' => 'Unknown error occurred'], 500);
+        return $this->jsonResponse($response, ['error' => 'Unknown error occurred'], 500);
     }
 
     private function jsonResponse(Response $response, array $data, int $status = 200): MessageInterface|Response

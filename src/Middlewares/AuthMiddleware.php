@@ -23,11 +23,7 @@ class AuthMiddleware
         preg_match('/Bearer\s+(\S+)/', $authHeader, $matches);
         $token = $matches[1]; // get bearer token
 
-        $uri = $request->getUri();
-        $path = $uri->getPath();
-        preg_match('/\/users\/(\d+)/', $path, $matches);
-        $userId = $matches[1];
-
+        $userId = $request->getHeaderLine('X-User-Id');
 
         $user = $this->verifyToken($token, $userId);
         if (!$user) {

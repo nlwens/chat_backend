@@ -24,7 +24,7 @@ class Message
             'user_id' => $userId,
             'content' => $content
         ]);
-        return $this->pdo->lastInsertId();
+        return 'Message sent successfully';
     }
 
     public function getByGroup($groupId, $since): array

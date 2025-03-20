@@ -22,4 +22,12 @@ class User
         ]);
         return $this->pdo->lastInsertId();
     }
+
+    // this method is only for testing use, no routes access
+    public function getAllUsers():array
+    {
+        $stmt = $this->pdo->prepare('SELECT * FROM users');
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 }

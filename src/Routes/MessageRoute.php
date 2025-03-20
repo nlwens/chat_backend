@@ -15,10 +15,10 @@ return function (RouteCollectorProxy $message, $pdo) {
     $message->group('', function (RouteCollectorProxy $message) use ($messageController) {
 
         // Send a message to a group
-        $message->post('/groups/{groupId}/users/{userId}/messages', [$messageController, 'sendMessage']);
+        $message->post('/groups/{groupId}/messages', [$messageController, 'sendMessage']);
 
         // Get all message from a group
-        $message->get('/groups/{groupId}/users/{userId}/messages', [$messageController, 'getMessagesByGroup']);
+        $message->get('/groups/{groupId}/messages', [$messageController, 'getMessagesByGroup']);
 
     })->add(new GroupPermissionMiddleware($groupModel))
         ->add(new AuthMiddleware($pdo));
