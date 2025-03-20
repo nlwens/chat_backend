@@ -42,8 +42,9 @@ class GroupController
         return $this->modifyGroupMembership($request, $response, $args, 'leave');
     }
 
-    // it is not necessary to check if the user really exists in the users table
-    // because it can't pass the AuthMiddleware
+    /* It is not necessary to check if the user really exists in the users table
+     * because it can't pass the AuthMiddleware
+     */
     private function modifyGroupMembership(Request $request, Response $response, $args, $action): MessageInterface|Response
     {
         $userId = $request->getHeaderLine('X-User-Id');

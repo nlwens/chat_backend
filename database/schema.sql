@@ -27,8 +27,8 @@ CREATE TABLE IF NOT EXISTS messages
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
--- 创建 user_groups 表
-CREATE TABLE user_groups
+-- Table for storing users in groups
+CREATE TABLE IF NOT EXISTS user_groups
 (
     id        INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id   INTEGER NOT NULL,
