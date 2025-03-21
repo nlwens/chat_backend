@@ -27,7 +27,7 @@ class AuthMiddleware
 
         $user = $this->verifyToken($token, $userId);
         if (!$user) {
-            return $this->unauthorizedResponse("Missing or invalid token");
+            return $this->unauthorizedResponse();
         }
 
         return $handler->handle($request);
@@ -43,10 +43,12 @@ class AuthMiddleware
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    private function unauthorizedResponse(string $message): Response
+    private function unauthorizedResponse(): Response
     {
+        if (ob_get_length()) ob_clean();
+
         $response = new SlimResponse();
-        $response->getBody()->write(json_encode(['error' => $message]));
+        $response->getBody()->write(json_encode(['error' => 'Missing or invalid token']));
         return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
     }
 }

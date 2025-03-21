@@ -1,19 +1,27 @@
 # Chat Application Backend
 
-This is a backend for a chat application written in PHP using the Slim framework. It allows users to create groups, join groups, and send messages within groups.
+## Introduction
+This document provides an overview of the **Chat Application** Backend project, which is a backend implementation for a simple chat application written in **PHP**. The application allows users to create public chat groups, join these groups, and send messages within them. The backend is built using the **Slim Framework** and stores data in an **SQLite** database. Communication between the client and server is handled via a RESTful JSON API.
+
+---
 
 ## Features
-- Create public chat groups.
-- User join chat groups
-- Send messages to groups.
-- List all messages in a group.
-- RESTful JSON API for communication.
+- **Group Management**: Users can create and join public chat groups. 
+- **Message Handling**: Users can send messages to groups and retrieve all messages within a group. 
+- **User Identification**: Users are identified by a unique token or ID, which is included in API requests. 
+- **Simple API**: The backend provides a clean and easy-to-use API for client interactions.
 
-## Technologies
-- PHP 8.x
-- Slim Framework
+---
+
+## Develop environment
+This project was developed and tested on **Ubuntu (version 22.04 LTS)**. All command-line operations, including database setup, dependency installation, and running the server, were performed in an Ubuntu terminal. Below are the key tools and versions used:
+- PHP 8
+- Slim Framework 4
 - SQLite
-- Ubuntu
+
+If you are using a different operating system, the commands may need to be adjusted accordingly. However, the provided instructions should work seamlessly on any Ubuntu-based environment.
+
+---
 
 ## Installation
 1. Clone the repository:
@@ -35,12 +43,15 @@ This is a backend for a chat application written in PHP using the Slim framework
 5. Start the server
     ```bash
    php -S localhost:8080 -t public
+   
+---
 
-## Tests
+## Technical Docs
+- [API Documentation](src/README.md)
+- [Database Documentation](database/README.md)
+- [Test Documentation](tests/README.md)
 
-1. Run all tests with phpunit
-   ```bash
-   vendor/bin/phpunit
+---
 
 ## Future Improvements
 - Support user authentication, preferable JWT token.

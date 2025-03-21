@@ -2,11 +2,11 @@
 
 use App\Controllers\UserController;
 use App\Models\User;
-use Random\RandomException;
-use Slim\Psr7\Factory\StreamFactory;
 use PHPUnit\Framework\TestCase;
+use Random\RandomException;
 use Slim\Psr7\Factory\RequestFactory;
 use Slim\Psr7\Factory\ResponseFactory;
+use Slim\Psr7\Factory\StreamFactory;
 
 class UserControllerTest extends TestCase
 {

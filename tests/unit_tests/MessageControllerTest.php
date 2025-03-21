@@ -2,10 +2,10 @@
 
 use App\Controllers\MessageController;
 use App\Models\Message;
-use Slim\Psr7\Factory\StreamFactory;
 use PHPUnit\Framework\TestCase;
 use Slim\Psr7\Factory\RequestFactory;
 use Slim\Psr7\Factory\ResponseFactory;
+use Slim\Psr7\Factory\StreamFactory;
 
 class MessageControllerTest extends TestCase
 {

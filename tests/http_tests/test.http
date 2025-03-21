@@ -1,0 +1,190 @@
+### HTTP test
+###
+### create a new user
+POST {{protocol}}{{host}}:{{port}}/users
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "new_user"
+}
+
+> {%
+    client.test("Create user successful", function(){
+        client.assert(response.status === 200, "Response is not correct!");
+        const token = response.body.token;
+        const userId = response.body.id;
+        client.global.set("userToken", token);
+        client.global.set("userId", userId);
+    })
+%}
+
+###
+### Create a new group
+POST {{protocol}}{{host}}:{{port}}/groups
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{userToken}}
+X-User-Id: {{userId}}
+
+{
+  "group_name": "New Group"
+}
+
+> {%
+    client.test("Create group successful", function(){
+        client.assert(response.status === 200, "Response is not correct!");
+        const groupId = response.body.group_id;
+        client.global.set("groupId", groupId);
+    })
+%}
+
+###
+### Join a group without valid token
+POST {{protocol}}{{host}}:{{port}}/groups/{{groupId}}/members
+Content-Type: application/json
+Accept: application/json
+X-User-Id: {{userId}}
+
+> {%
+    client.test("Missing or invalid token", function(){
+        client.assert(response.status === 401, "Response is not correct!");
+        client.assert(response.body.error === "Missing or invalid token", "Wrong error message");
+    })
+%}
+
+
+###
+### Join a group
+POST {{protocol}}{{host}}:{{port}}/groups/{{groupId}}/members
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{userToken}}
+X-User-Id: {{userId}}
+
+> {%
+    client.test("User successfully joined the group", function(){
+        client.assert(response.status === 200, "Response is not correct!");
+    })
+%}
+
+###
+### Join a group when user already in
+POST {{protocol}}{{host}}:{{port}}/groups/{{groupId}}/members
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{userToken}}
+X-User-Id: {{userId}}
+
+> {%
+    client.test("User already in the group", function(){
+        client.assert(response.status === 400, "Response is not correct!");
+        client.assert(response.body.error === "User already in the group", "Wrong error message");
+    })
+%}
+
+
+###
+### Join a group that doesn't exist
+POST {{protocol}}{{host}}:{{port}}/groups/100/members
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{userToken}}
+X-User-Id: {{userId}}
+
+> {%
+    client.test("Group does not exist", function(){
+        client.assert(response.status === 400, "Response is not correct!");
+        client.assert(response.body.error === "Group does not exist", "Wrong error message");
+    })
+%}
+
+###
+### Send a message to the group
+POST {{protocol}}{{host}}:{{port}}/groups/{{groupId}}/messages
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{userToken}}
+X-User-Id: {{userId}}
+
+{
+  "content" : "http test message"
+}
+
+> {%
+    client.test("Message sent successfully", function(){
+        client.assert(response.status === 200, "Response is not correct!");
+        client.log(request.body);
+        client.global.set("messageContent", "http test message");
+    })
+%}
+
+###
+### Send a message to a group that user not in
+POST {{protocol}}{{host}}:{{port}}/groups/100/messages
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{userToken}}
+X-User-Id: {{userId}}
+
+{
+  "content" : "http test message"
+}
+
+> {%
+    client.test("User is not in the group", function(){
+        client.assert(response.status === 403, "Response is not correct!");
+        client.assert(response.body.error === "User is not in the group", "Wrong error message");
+    })
+%}
+
+
+###
+### Get messages from a group
+GET {{protocol}}{{host}}:{{port}}/groups/{{groupId}}/messages
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{userToken}}
+X-User-Id: {{userId}}
+
+> {%
+    client.test("User is not in the group", function(){
+        client.assert(response.status === 200, "Response is not correct!");
+
+        // check if the message sent in previous test is returned
+        const expectedContent = client.global.get("messageContent");
+        const messages = response.body;
+        client.assert(Array.isArray(messages), "Response body is not an array");
+        const found = messages.some(message => message.content === expectedContent);
+        client.assert(found, `Expected message content "${expectedContent}" not found in response`);
+    })
+%}
+
+###
+### Leave a group
+DELETE {{protocol}}{{host}}:{{port}}/groups/{{groupId}}/members
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{userToken}}
+X-User-Id: {{userId}}
+
+> {%
+    client.test("User successfully left the group", function(){
+        client.assert(response.status === 200, "Response is not correct!");
+    })
+%}
+
+###
+### Leave a group that user is not in
+DELETE {{protocol}}{{host}}:{{port}}/groups/{{groupId}}/members
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{userToken}}
+X-User-Id: {{userId}}
+
+> {%
+    client.test("User is not in the group", function(){
+        client.assert(response.status === 403, "Response is not correct!");
+        client.assert(response.body.error === "User is not in the group", "Wrong error message");
+    })
+%}

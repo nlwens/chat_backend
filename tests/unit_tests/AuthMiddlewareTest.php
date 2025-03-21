@@ -1,9 +1,7 @@
 <?php
 
-namespace Tests\Middlewares;
 
 use App\Middlewares\AuthMiddleware;
-use PDO;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Server\RequestHandlerInterface;
 use Slim\Psr7\Factory\RequestFactory;

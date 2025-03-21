@@ -28,8 +28,8 @@ class GroupController
         $data = $request->getParsedBody();
         $groupName = $data['group_name'];
 
-        $message = $this->groupModel->create($groupName);
-        return $this->jsonResponse($response, ['message' => $message]);
+        $groupId = $this->groupModel->create($groupName);
+        return $this->jsonResponse($response, ['group_id' => $groupId]);
     }
 
     public function joinGroup(Request $request, Response $response, $args): MessageInterface|Response

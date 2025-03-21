@@ -1,11 +1,11 @@
 <?php
 
+use App\Controllers\GroupController;
 use App\Models\Group;
-use Slim\Psr7\Factory\StreamFactory;
 use PHPUnit\Framework\TestCase;
 use Slim\Psr7\Factory\RequestFactory;
 use Slim\Psr7\Factory\ResponseFactory;
-use App\Controllers\GroupController;
+use Slim\Psr7\Factory\StreamFactory;
 
 class GroupControllerTest extends TestCase
 {
@@ -67,8 +67,7 @@ class GroupControllerTest extends TestCase
         $responseBody = (string)$response->getBody();
         $this->assertJson($responseBody);
         $responseData = json_decode($responseBody, true);
-        $this->assertArrayHasKey('message', $responseData);
-        $this->assertEquals('Group created successfully', $responseData['message']);
+        $this->assertArrayHasKey('group_id', $responseData);
 
         // check the last group is the new added group
         $groupList = $this->group->getAll();

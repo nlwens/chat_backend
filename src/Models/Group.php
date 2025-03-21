@@ -21,7 +21,7 @@ class Group
             VALUES (:group_name)'
         );
         $stmt->execute(['group_name' => $groupName]);
-        return 'Group created successfully';
+        return $this->pdo->lastInsertId();
     }
 
     public function getAll(): array

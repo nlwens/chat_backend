@@ -1,17 +1,12 @@
 <?php
 
-namespace Tests\Middlewares;
 
 use App\Middlewares\GroupPermissionMiddleware;
 use App\Models\Group;
-use PDO;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Server\RequestHandlerInterface;
-use Slim\Factory\AppFactory;
 use Slim\Psr7\Factory\RequestFactory;
 use Slim\Psr7\Factory\ResponseFactory;
-use Slim\Routing\RouteContext;
-use Slim\Routing\Route;
 
 class GroupPermissionMiddlewareTest extends TestCase
 {
