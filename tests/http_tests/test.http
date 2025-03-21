@@ -78,8 +78,8 @@ X-User-Id: {{userId}}
 
 > {%
     client.test("User already in the group", function(){
-        client.assert(response.status === 400, "Response is not correct!");
-        client.assert(response.body.error === "User already in the group", "Wrong error message");
+        client.assert(response.status === 409, "Response is not correct!");
+        client.assert(response.body.error === "User is already in the group", "Wrong error message");
     })
 %}
 
@@ -94,8 +94,8 @@ X-User-Id: {{userId}}
 
 > {%
     client.test("Group does not exist", function(){
-        client.assert(response.status === 400, "Response is not correct!");
-        client.assert(response.body.error === "Group does not exist", "Wrong error message");
+        client.assert(response.status === 404, "Response is not correct!");
+        client.assert(response.body.error === "Cannot find the group", "Wrong error message");
     })
 %}
 
@@ -114,8 +114,26 @@ X-User-Id: {{userId}}
 > {%
     client.test("Message sent successfully", function(){
         client.assert(response.status === 200, "Response is not correct!");
-        client.log(request.body);
         client.global.set("messageContent", "http test message");
+    })
+%}
+
+###
+### Send an empty message to the group
+POST {{protocol}}{{host}}:{{port}}/groups/{{groupId}}/messages
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{userToken}}
+X-User-Id: {{userId}}
+
+{
+  "content" : null
+}
+
+> {%
+    client.test("Message sent successfully", function(){
+        client.assert(response.status === 400, "Response is not correct!");
+        client.assert(response.body.error === "Message cannot be empty", "Wrong error message");
     })
 %}
 

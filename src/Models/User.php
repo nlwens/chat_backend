@@ -23,7 +23,7 @@ class User
         return $this->pdo->lastInsertId();
     }
 
-    // this method is only for testing use, no routes access
+    // this method is only for testing use, no API access
     public function getAllUsers():array
     {
         $stmt = $this->pdo->prepare('SELECT * FROM users');

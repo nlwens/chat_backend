@@ -18,7 +18,7 @@ return function (RouteCollectorProxy $group, $pdo) {
         // create a new group
         $group->post('', [$groupController, 'create']);
 
-        // user join or leave a group
+        // user join a group
         $group->post('/{groupId}/members', [$groupController, 'joinGroup']);
 
         // user leave a group

@@ -88,6 +88,30 @@ class MessageControllerTest extends TestCase
         $this->assertEquals('Test Message 2', end($messageList)['content']);
     }
 
+    public function testSendEmptyMessage()
+    {
+        $factory = new RequestFactory();
+        $request = $factory->createRequest('POST', '/groups/1/messages')
+            ->withHeader('X-User-Id', 1)
+            ->withHeader('Content-Type', 'application/json');
+
+        $args = ['groupId' => 1];
+        $request = $request->withParsedBody(json_decode($request->getBody()->getContents(), true));
+        $responseFactory = new ResponseFactory();
+        $response = $responseFactory->createResponse();
+        $response = $this->controller->sendMessage($request, $response, $args);
+
+        // check http code
+        $this->assertEquals(400, $response->getStatusCode());
+
+        // check return message
+        $responseBody = (string)$response->getBody();
+        $this->assertJson($responseBody);
+        $responseData = json_decode($responseBody, true);
+        $this->assertArrayHasKey('error', $responseData);
+        $this->assertEquals('Message cannot be empty', $responseData['error']);
+    }
+
     public function testGetMessage()
     {
         $factory = new RequestFactory();

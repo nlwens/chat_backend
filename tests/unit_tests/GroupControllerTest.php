@@ -116,14 +116,14 @@ class GroupControllerTest extends TestCase
         $response = $this->controller->joinGroup($request, $response, $args);
 
         // check http code
-        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals(409, $response->getStatusCode());
 
         // check return message
         $responseBody = (string)$response->getBody();
         $this->assertJson($responseBody);
         $responseData = json_decode($responseBody, true);
         $this->assertArrayHasKey('error', $responseData);
-        $this->assertEquals('User already in the group', $responseData['error']);
+        $this->assertEquals('User is already in the group', $responseData['error']);
     }
 
     public function testUserJoinGroupNotExists()
@@ -140,14 +140,14 @@ class GroupControllerTest extends TestCase
         $response = $this->controller->joinGroup($request, $response, $args);
 
         // check http code
-        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals(404, $response->getStatusCode());
 
         // check return message
         $responseBody = (string)$response->getBody();
         $this->assertJson($responseBody);
         $responseData = json_decode($responseBody, true);
         $this->assertArrayHasKey('error', $responseData);
-        $this->assertEquals('Group does not exist', $responseData['error']);
+        $this->assertEquals('Cannot find the group', $responseData['error']);
     }
 
     public function testUserLeaveAGroup()

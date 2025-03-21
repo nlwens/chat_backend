@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\Group;
+use Exception;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -23,12 +24,19 @@ class GroupController
     }
 
     // create a new group
+
+    /**
+     * @throws Exception
+     */
     public function create(Request $request, Response $response): MessageInterface|Response
     {
         $data = $request->getParsedBody();
         $groupName = $data['group_name'];
-
+        $userId = $request->getHeaderLine('X-User-Id');
         $groupId = $this->groupModel->create($groupName);
+
+        // After the group is created, the user should automatically join this group
+        $this->groupModel->addUserToGroup($groupId, $userId);
         return $this->jsonResponse($response, ['group_id' => $groupId]);
     }
 
@@ -63,8 +71,8 @@ class GroupController
                 $status = ($action === 'join') ? 'joined' : 'left';
                 return $this->jsonResponse($response, ['message' => "User successfully {$status} the group"]);
             }
-        } catch (\Exception $e) {
-            return $this->jsonResponse($response, ['error' => $e->getMessage()], 400);
+        } catch (Exception $e) {
+            return $this->jsonResponse($response, ['error' => $e->getMessage()], $e->getCode());
         }
 
         return $this->jsonResponse($response, ['error' => 'Unknown error occurred'], 500);

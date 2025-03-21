@@ -37,12 +37,12 @@ class Group
     {
         // check if this group exists
         if (!$this->ifGroupExists($groupId)) {
-            throw new Exception('Group does not exist');
+            throw new Exception('Cannot find the group', 404);
         }
 
         // check if user already in the group
         if ($this->isUserInGroup($userId, $groupId)) {
-            throw new Exception('User already in the group');
+            throw new Exception('User is already in the group', 409);
         }
 
         try {
@@ -56,7 +56,7 @@ class Group
             ]);
             return true;
         } catch (\PDOException $e) {
-            throw new Exception('Failed to add user to the group: ' . $e->getMessage());
+            throw new Exception($e->getMessage(), 500);
         }
     }
 
@@ -78,7 +78,7 @@ class Group
             ]);
             return true;
         } catch (\PDOException $e) {
-            throw new Exception('Failed to remove user from the group: ' . $e->getMessage());
+            throw new Exception($e->getMessage());
         }
     }
 
