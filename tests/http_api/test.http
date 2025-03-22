@@ -1,4 +1,4 @@
-### HTTP test
+### HTTP API test
 ###
 ### create a new user
 POST {{protocol}}{{host}}:{{port}}/users
@@ -56,7 +56,7 @@ X-User-Id: {{userId}}
 
 ###
 ### Join a group
-POST {{protocol}}{{host}}:{{port}}/groups/{{groupId}}/members
+POST {{protocol}}{{host}}:{{port}}/groups/1/members
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{userToken}}
@@ -70,7 +70,7 @@ X-User-Id: {{userId}}
 
 ###
 ### Join a group when user already in
-POST {{protocol}}{{host}}:{{port}}/groups/{{groupId}}/members
+POST {{protocol}}{{host}}:{{port}}/groups/1/members
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{userToken}}

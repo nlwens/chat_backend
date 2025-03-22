@@ -1,16 +1,21 @@
 <?php
 
+namespace Unit\Middleware;
 
 use App\Middlewares\AuthMiddleware;
+use PDO;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Server\RequestHandlerInterface;
 use Slim\Psr7\Factory\RequestFactory;
 use Slim\Psr7\Factory\ResponseFactory;
+use Slim\Psr7\Request;
 
 class AuthMiddlewareTest extends TestCase
 {
     private PDO $pdo;
     private AuthMiddleware $middleware;
+    private RequestFactory $requestFactory;
+    private ResponseFactory $responseFactory;
 
     protected function setUp(): void
     {
@@ -21,32 +26,42 @@ class AuthMiddlewareTest extends TestCase
         $this->pdo->exec("INSERT INTO users (id, token) VALUES (1, 'valid-token')");
 
         $this->middleware = new AuthMiddleware($this->pdo);
+
+        $this->requestFactory = new RequestFactory();
+        $this->responseFactory = new ResponseFactory();
+    }
+
+    private function createRequest($headers): Request
+    {
+        $request = $this->requestFactory->createRequest('GET', '/groups');
+        foreach ($headers as $name => $value) {
+            $request = $request->withHeader($name, $value);
+        }
+        return $request;
     }
 
     public function testValidToken()
     {
-        $request = (new RequestFactory())->createRequest('GET', '/groups')
-            ->withHeader('X-User-Id', 1)
-            ->withHeader('Authorization', 'Bearer valid-token');
-        $handler = $this->createMock(RequestHandlerInterface::class);
+        $request = $this->createRequest([
+            'X-User-Id' => 1,
+            'Authorization' => 'Bearer valid-token'
+        ]);
 
+        $handler = $this->createMock(RequestHandlerInterface::class);
         $handler->expects($this->once())
             ->method('handle')
-            ->willReturn((new ResponseFactory())->createResponse());
+            ->willReturn($this->responseFactory->createResponse());
 
         $response = $this->middleware->__invoke($request, $handler);
-
         $this->assertEquals(200, $response->getStatusCode());
     }
 
     public function testMissingAuthorizationHeader()
     {
-        $request = (new RequestFactory())->createRequest('GET', '/groups')
-            ->withHeader('X-User-Id', 1);
+        $request = $this->createRequest(['X-User-Id' => 1]);
         $handler = $this->createMock(RequestHandlerInterface::class);
 
         $response = $this->middleware->__invoke($request, $handler);
-
         $this->assertEquals(401, $response->getStatusCode());
         $this->assertJsonStringEqualsJsonString(
             '{"error":"Missing or invalid token"}',
@@ -56,13 +71,13 @@ class AuthMiddlewareTest extends TestCase
 
     public function testInvalidToken()
     {
-        $request = (new RequestFactory())->createRequest('GET', '/groups')
-            ->withHeader('X-User-Id', 1)
-            ->withHeader('Authorization', 'Bearer invalid-token');
+        $request = $this->createRequest([
+            'X-User-Id' => 1,
+            'Authorization' => 'Bearer invalid-token'
+        ]);
         $handler = $this->createMock(RequestHandlerInterface::class);
 
         $response = $this->middleware->__invoke($request, $handler);
-
         $this->assertEquals(401, $response->getStatusCode());
         $this->assertJsonStringEqualsJsonString(
             '{"error":"Missing or invalid token"}',

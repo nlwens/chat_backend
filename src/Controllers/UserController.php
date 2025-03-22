@@ -17,7 +17,6 @@ class UserController
         $this->userModel = $userModel;
     }
 
-
     /**
      * @throws RandomException
      */
@@ -27,18 +26,24 @@ class UserController
         $username = $data['username'];
 
         if (!$username) {
-            $response->getBody()->write(json_encode(['error' => 'Username cannot be empty']));
-            return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+            $errorMsg = ['error' => 'Username cannot be empty'];
+            return $this->jsonResponse($response, $errorMsg,400);
         }
 
         $token = bin2hex(random_bytes(16));
         $userId = $this->userModel->create($username, $token);
 
-        $response->getBody()->write(json_encode([
+        $data = [
             'id' => $userId,
             'username' => $username,
             'token' => $token
-        ]));
-        return $response->withHeader('Content-Type', 'application/json');
+        ];
+        return $this->jsonResponse($response, $data, 200);
+    }
+
+    private function jsonResponse(Response $response, $data, $status): MessageInterface|Response
+    {
+        $response->getBody()->write(json_encode($data));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus($status);
     }
 }
