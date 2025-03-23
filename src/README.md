@@ -372,113 +372,39 @@ X-User-Id: <your_id>
 
 ---
 
-## Future Enhancements
+## Possible Future Enhancements
 
-The following features are not part of the current API but are potential future improvements:
+The following features are not required in the assessment doc, but can be possible potential future improvements:
 
-### 1. **Search API**
+>**PUT /users/:userId**: 
+> 
+>Allow users to change their username.
+>```sql
+>UPDATE users 
+>SET username = [new_username]
+>WHERE id = [user_id]
+>```
 
-- **GET /search**
-    - **Description**: Enable users to search for tours or highlights based on keywords or categories.
-    - **Request Parameters**:
-        - `q` (string, optional): Search query.
-        - `category` (string, optional): Filter by category (e.g., "Historical").
-    - **Response**:
-      ```json
-      [
-        {
-          "id": 1,
-          "name": "Historical Tour",
-          "description": "Explore the rich history of Deventer."
-        },
-        {
-          "id": 101,
-          "name": "Old Church",
-          "description": "A historical church in the city center."
-        }
-      ]
-      ```
+>**DELETE /users/:userId**: 
+> 
+>Allow users to delete their accounts.
+>```sql
+> DELETE FROM users
+> WHERE id = [user_id]
+>```
 
-### 2. **Moderator API**
+>**PUT /groups/:groupId**: 
+> 
+>Allow users to change the group name.
+>```sql
+> UPDATE groups
+> SET group_name = [new_group_name]
+> WHERE id = [group_id]
+>```
 
-- Approve or reject user-submitted highlights or comments.
-    - **Endpoints** (future design):
-        - **POST /moderator/approve/:id**: Approve a specific highlight or comment.
-        - **POST /moderator/reject/:id**: Reject a specific highlight or comment.
-
-> **Note**: These enhancements are outside the current sprint's scope and are subject to discussion and prioritization.
-
-
----
-
-## Other Explanation:
-
----
-
-### About how to implement: PATCH /tours/:id/customize :
-
-### **Backend Workflow**
-
-#### 1. Validate Tour and Highlights
-
-- Confirm the `tourId` exists in the `Tour` table.
-- Verify that the `highlightId`s in `enabledHighlights`, `disabledHighlights`, and `updatedOrder` exist in the
-  `Highlight` table.
-- Check that the `highlightId`s belong to the specified `tourId` in the `TourHighlight` table.
-
-#### 2. Update Associations
-
-- **Enable Highlights**: Add entries to the `TourHighlight` table for IDs in `enabledHighlights`:
-  ```sql
-  INSERT INTO TourHighlight (tourID, highlightID)
-  VALUES ($1, $2)
-  ON CONFLICT DO NOTHING;
-  ```
-
-- **Disable Highlights**: Remove entries from the `TourHighlight` table for IDs in `disabledHighlights`:
-  ```sql
-  DELETE FROM TourHighlight
-  WHERE tourID = $1 AND highlightID = $2;
-  ```
-
-#### 3. Update Order
-
-- Update the `order` field in the `TourHighlight` table for each highlight in `updatedOrder`:
-  ```sql
-  UPDATE TourHighlight
-  SET "order" = $3
-  WHERE tourID = $1 AND highlightID = $2;
-  ```
-
-#### 4. Fetch Updated Highlights
-
-- Fetch the customized highlights for the tour:
-  ```sql
-  SELECT th.highlightID, h.name, th."order", 
-         CASE 
-           WHEN th.highlightID IN (SELECT highlightID FROM TourHighlight WHERE tourID = $1)
-           THEN 'enabled' 
-           ELSE 'disabled' 
-         END AS status
-  FROM Highlight h
-  LEFT JOIN TourHighlight th ON h.id = th.highlightID
-  WHERE th.tourID = $1
-  ORDER BY th."order";
-  ```
-
----
-
-### **Integration with the Database Design**
-
-1. **`TourHighlight` Table**:
-    - Used to manage the relationships between tours and highlights.
-    - The `order` field is critical for determining the sequence of highlights within a tour.
-
-2. **Customizing Highlights**:
-    - `enabledHighlights` adds entries to `TourHighlight`.
-    - `disabledHighlights` removes entries from `TourHighlight`.
-
-3. **Reordering Highlights**:
-    - The `order` field in `TourHighlight` is updated using the `updatedOrder` array.
-
----
+>**DELETE /groups/:groupId**: 
+>Allow users to delete chatting groups.
+> ```sql
+> DELETE FROM groups
+> WHERE id = [group_id]
+>```

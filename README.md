@@ -26,7 +26,7 @@ If you are using a different operating system, the commands may need to be adjus
 ## Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/chat-backend.git
+   git clone https://github.com/nlwens/chat_backend.git
 
 2. Install dependencies:
    ```bash
@@ -53,7 +53,7 @@ If you are using a different operating system, the commands may need to be adjus
 
 ---
 
-## Future Improvements
-- Support user authentication, preferable JWT token.
-- Add full CRUD for all 3 sources.
-- Optimize database queries for better performance.
+## Possible Future Improvements
+- Support user authentication, preferably using JWT token.
+- Add more features such as changing username or group name to enhance functionality.
+- Optimize database queries or introduce redis cache for better performance.
